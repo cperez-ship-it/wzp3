@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dashboard de Reporte Diario</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; background:#f5f7fb; color:#1f2937; }
+    .wrap { max-width: 1200px; margin:0 auto; }
+    .cards { display:grid; grid-template-columns: repeat(4,1fr); gap:14px; margin:18px 0; }
+    .card { background:white; border-radius:14px; padding:18px; box-shadow:0 2px 10px rgba(0,0,0,.06); }
+    .big { font-size:28px; font-weight:700; margin-top:6px; }
+    table { width:100%; border-collapse: collapse; background:white; border-radius:14px; overflow:hidden; }
+    th, td { padding:12px 10px; border-bottom:1px solid #e5e7eb; text-align:left; font-size:14px; }
+    th { background:#0f172a; color:white; }
+    .ok { font-weight:700; color:#0f766e; }
+    .bad { font-weight:700; color:#b91c1c; }
+    .top { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    a.btn { background:#0f172a; color:white; text-decoration:none; padding:10px 14px; border-radius:10px; }
+    @media (max-width: 900px) { .cards { grid-template-columns:1fr 1fr; } }
+    @media (max-width: 560px) { .cards { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>{{ company }}</h1>
+      <div>Control diario de arribo y evidencia · Fecha {{ report_date }}</div>
+    </div>
+    <div>
+      <a class="btn" href="/export.csv?date={{ report_date }}">Exportar CSV</a>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card"><div>Total personas</div><div class="big">{{ totals.total }}</div></div>
+    <div class="card"><div>Con ubicación</div><div class="big">{{ totals.with_location }}</div></div>
+    <div class="card"><div>Con foto</div><div class="big">{{ totals.with_photo }}</div></div>
+    <div class="card"><div>Con OK INICIO</div><div class="big">{{ totals.with_ok }}</div></div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nombre</th><th>Rol</th><th>Centro</th><th>Puerto</th><th>Ubicación</th><th>Foto</th><th>Texto</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in rows %}
+      <tr>
+        <td>{{ r.name or '-' }}</td>
+        <td>{{ r.role or '-' }}</td>
+        <td>{{ r.center or '-' }}</td>
+        <td>{{ r.port or '-' }}</td>
+        <td>{% if r.location_lat %}<span class="ok">OK</span>{% else %}<span class="bad">Pendiente</span>{% endif %}</td>
+        <td>{% if r.photo_media_id %}<span class="ok">OK</span>{% else %}<span class="bad">Pendiente</span>{% endif %}</td>
+        <td>{% if (r.text_reply or '').upper() == 'OK INICIO' %}<span class="ok">OK INICIO</span>{% else %}<span class="bad">{{ r.text_reply or 'Pendiente' }}</span>{% endif %}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+</body>
+</html>
